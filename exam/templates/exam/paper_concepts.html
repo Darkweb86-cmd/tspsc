@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ paper.name }} - Modules</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #4f46e5;
+        --primary-glow: rgba(79, 70, 229, 0.4);
+        --bg-dark: #0f172a;
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --text-dim: #94a3b8;
+        --accent: #0ea5e9;
+        --success: #22c55e;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--bg-dark);
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+        color: #ffffff;
+        margin: 0;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    header {
+        margin-bottom: 40px;
+        border-left: 5px solid var(--primary);
+        padding-left: 20px;
+    }
+
+    h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .breadcrumb {
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* Grid */
+    .concept-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    /* Glassy Cards */
+    .concept-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .concept-card:hover {
+        transform: translateY(-6px);
+        background: rgba(30,41,59,0.9);
+        box-shadow: 0 0 25px var(--primary-glow);
+        border-color: var(--primary);
+    }
+
+    .concept-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .concept-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(79,70,229,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--primary);
+        border: 1px solid rgba(79,70,229,0.2);
+    }
+
+    .concept-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .question-count {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .question-count::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--success);
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Arrow */
+    .arrow-icon {
+        font-size: 1.5rem;
+        color: var(--primary);
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .concept-card:hover .arrow-icon {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Empty State */
+    .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 60px;
+        background: var(--card-bg);
+        border-radius: 16px;
+        border: 2px dashed rgba(255,255,255,0.1);
+        color: var(--text-dim);
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <span class="breadcrumb">Subject Overview</span>
+        <h1>{{ paper.name }}</h1>
+    </header>
+
+    <ul class="concept-grid">
+        {% for concept in concepts %}
+        <li class="concept-card">
+            <a href="{% url 'exam:concept_questions' concept.id %}" class="concept-link">
+                <div class="concept-info">
+                    <div class="icon-box">{{ forloop.counter }}</div>
+                    <div>
+                        <div class="concept-name">{{ concept.name }}</div>
+                        <div class="question-count">{{ concept.questions.count }} Practice Questions</div>
+                    </div>
+                </div>
+                <div class="arrow-icon">→</div>
+            </a>
+        </li>
+        {% empty %}
+        <li class="empty-state">
+            <h3>No modules available yet</h3>
+            <p>Check back later for updated content.</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+</body>
+</html>

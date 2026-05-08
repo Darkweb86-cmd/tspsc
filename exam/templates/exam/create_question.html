@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Question</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f9; padding: 30px; }
+        .container { background: white; padding: 25px; border-radius: 8px; width: 70%; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        select, textarea, button { width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 20px; }
+        textarea { height: 250px; font-family: monospace; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .format-box { background: #f1f1f1; padding: 15px; font-size: 14px; border-radius: 5px; margin-bottom: 20px; white-space: pre-wrap; }
+        h2 { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Create Question</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Paper Dropdown -->
+        <label>Select Paper:</label>
+        <select id="paperSelect" name="paper" required>
+            <option value="">-- Select Paper --</option>
+            {% for paper in papers %}
+                <option value="{{ paper.id }}">{{ paper.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Concept Dropdown -->
+        <label>Select Concept:</label>
+        <select id="conceptSelect" name="concept" required>
+            <option value="">-- Select Concept --</option>
+            {% for concept in concepts %}
+                <option value="{{ concept.id }}" data-paper="{{ concept.paper.id }}">
+                    {{ concept.name }} (Paper: {{ concept.paper.name }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- Question Type Dropdown -->
+        <label>Select Question Type:</label>
+        <select name="questiontype" required>
+            {% for type in questiontypes %}
+                <option value="{{ type.id }}">{{ type.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- JSON Input -->
+        <label>Paste Question JSON:</label>
+        <textarea name="question_data" placeholder="Paste JSON here..." required></textarea>
+
+        <button type="submit">Save Question</button>
+    </form>
+
+    <!-- Format Help -->
+    <h3>JSON Format Examples</h3>
+    <div class="format-box">
+MCQ Example:
+{
+  "question": "Capital of Telangana?",
+  "options": { "A": "Hyderabad", "B": "Warangal", "C": "Karimnagar", "D": "Nizamabad" },
+  "correct": "A",
+  "explain": "Hyderabad is capital"
+}
+
+MATCH Example:
+{
+  "question": "Match the following",
+  "column_a": [ {"id": 1, "text": "Gandhi"}, {"id": 2, "text": "Nehru"} ],
+  "column_b": [ {"id": "A", "text": "Father of Nation"}, {"id": "B", "text": "First PM"} ],
+  "correct": { "1": "A", "2": "B" },
+  "explain": "Leaders and roles"
+}
+
+MULTI STATEMENT Example:
+{
+  "question": "Which statements are correct?",
+  "statements": ["Statement 1", "Statement 2", "Statement 3"],
+  "options": { "A": "1 and 2", "B": "2 and 3", "C": "All", "D": "None" },
+  "correct": "A",
+  "explain": "Explanation here"
+}
+    </div>
+</div>
+
+<script>
+    // Filter concepts by selected paper
+    const paperSelect = document.getElementById('paperSelect');
+    const conceptSelect = document.getElementById('conceptSelect');
+
+    paperSelect.addEventListener('change', function() {
+        const selectedPaperId = this.value;
+        Array.from(conceptSelect.options).forEach(option => {
+            const paperId = option.dataset.paper;
+            option.style.display = (paperId === selectedPaperId) ? 'block' : 'none';
+        });
+        conceptSelect.value = "";
+    });
+</script>
+
+</body>
+</html>
+
+
+

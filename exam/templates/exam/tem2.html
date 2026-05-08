@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ concept.name }} - Practice</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f9;
+  padding:20px;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+h1{color:#1a73e8;margin:0;}
+h2{color:#666;font-weight:400;}
+
+.question-card{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  margin-bottom:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+.option-item{
+  margin-bottom:10px;
+}
+
+.option-item label{
+  display:block;
+  padding:8px 12px;
+  border:1px solid #ddd;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.correct-answer{
+  background:#e6f4ea;
+  border-color:#34a853 !important;
+}
+
+.wrong-answer{
+  background:#fce8e6;
+  border-color:#ea4335 !important;
+}
+
+.correct,.explain{
+  display:none;
+  margin-top:10px;
+  background:#fff8e1;
+  padding:10px;
+  border-left:4px solid orange;
+}
+
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.attempt-btn{
+  background:#34a853;
+  color:white;
+}
+
+.submit-btn{
+  background:#1a73e8;
+  color:white;
+}
+
+#result-section{
+  display:none;
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+#score-chart{
+  max-width:250px;
+  margin:20px auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <h1>Paper: {{ concept.paper.name }}</h1>
+  <h2>Concept: {{ concept.name }}</h2>
+</header>
+
+<button class="attempt-btn" type="button" id="attemptBtn">
+  Attempt Exam
+</button>
+
+<div id="result-section">
+  <h3>Exam Result</h3>
+  <canvas id="score-chart"></canvas>
+  <div id="score-text" style="font-size:20px;font-weight:700;"></div>
+  <div id="result-message" style="margin-top:8px;font-size:17px;"></div>
+</div>
+
+<form id="quiz-form">
+{% csrf_token %}
+
+{% for q in questions %}
+<div class="question-card" data-index="{{ forloop.counter0 }}">
+  <p><b>Q{{ forloop.counter }}.</b> {{ q.question_data.0.question }}</p>
+
+  {% for key,value in q.question_data.0.options.items %}
+  <div class="option-item">
+    <label>
+      <input type="radio" name="q{{ forloop.parentloop.counter0 }}" value="{{ key }}">
+      {{ key }}. {{ value }}
+    </label>
+  </div>
+  {% endfor %}
+
+  <input type="hidden" class="correct-val" value="{{ q.question_data.0.answer }}">
+
+  <div class="correct">
+    <b>Correct:</b> {{ q.question_data.0.correct }}
+  </div>
+
+  <div class="explain">
+    <b>Explain:</b> {{ q.question_data.0.explain }}
+  </div>
+</div>
+{% endfor %}
+
+<br>
+<button type="submit" class="submit-btn">Submit</button>
+</form>
+
+</div>
+
+<script>
+$(document).ready(function(){
+
+let examStarted = false;
+
+$("#attemptBtn").click(function(){
+  examStarted = true;
+  alert("Exam Started 👍");
+});
+
+/* AJAX Submit */
+$("#quiz-form").submit(function(e){
+  e.preventDefault();
+
+  if(!examStarted){
+    alert("Click Attempt Exam first!");
+    return;
+  }
+
+  let total = {{ questions|length }};
+  let correctCount = 0;
+  let allAnswered = true;
+
+  $(".question-card").each(function(){
+
+    let selected = $(this).find("input[type=radio]:checked");
+    let correctVal = $(this).find(".correct-val").val();
+
+    if(selected.length === 0){
+      allAnswered = false;
+      return false; // break loop
+    }
+
+    if(selected.val() === correctVal){
+      correctCount++;
+      selected.closest("label").addClass("correct-answer");
+    } else {
+      selected.closest("label").addClass("wrong-answer");
+      $(this).find('input[value="'+correctVal+'"]')
+             .closest("label")
+             .addClass("correct-answer");
+    }
+
+    $(this).find(".correct").show();
+    $(this).find(".explain").show();
+  });
+
+  if(!allAnswered){
+    alert("Please answer all questions!");
+    return;
+  }
+
+  /* Show Result */
+  $("#result-section").show();
+  $("#score-text").text("You scored "+correctCount+" out of "+total);
+
+  let msg="";
+  if(correctCount <=4){
+    msg="Well Try 👍 Keep Practicing!";
+  }else if(correctCount <=7){
+    msg="Good Attempt 👏";
+  }else{
+    msg="Excellent Performance 🎉";
+  }
+
+  $("#result-message").text(msg);
+
+  drawChart(correctCount,total-correctCount);
+
+  $("html, body").animate({scrollTop:0},500);
+
+});
+
+function drawChart(correct, wrong){
+
+  const canvas=document.getElementById("score-chart");
+  const ctx=canvas.getContext("2d");
+
+  canvas.width=250;
+  canvas.height=250;
+
+  let total=correct+wrong;
+  if(total===0) return;
+
+  let angles=[(correct/total)*2*Math.PI,(wrong/total)*2*Math.PI];
+  let colors=["#34a853","#ea4335"];
+  let start=0;
+
+  for(let i=0;i<2;i++){
+    ctx.beginPath();
+    ctx.moveTo(125,125);
+    ctx.arc(125,125,100,start,start+angles[i]);
+    ctx.fillStyle=colors[i];
+    ctx.fill();
+    start+=angles[i];
+  }
+
+  ctx.beginPath();
+  ctx.arc(125,125,60,0,2*Math.PI);
+  ctx.fillStyle="#fff";
+  ctx.fill();
+}
+
+});
+</script>
+
+</body>
+</html>

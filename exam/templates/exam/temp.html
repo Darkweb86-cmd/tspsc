@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>{{ concept.name }} - Interactive Practice</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #1a73e8;
+        --primary-dark: #1557b0;
+        --success: #34a853;
+        --error: #ea4335;
+        --bg: #f8f9fa;
+        --card-bg: #ffffff;
+        --text: #202124;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 40px 20px;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      h1 {
+        font-size: 2.2rem;
+        color: var(--primary);
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+      }
+      h2 {
+        font-size: 1.1rem;
+        color: #5f6368;
+        font-weight: 400;
+      }
+
+      /* Question Card Styling */
+      .question-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow:
+          0 4px 6px rgba(0, 0, 0, 0.02),
+          0 10px 15px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+        position: relative;
+      }
+
+      .question-header {
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      /* Radio Button Customization */
+      .options-list {
+        list-style: none;
+        padding: 0;
+      }
+      .option-item {
+        margin-bottom: 12px;
+        position: relative;
+      }
+      .option-item label {
+        display: flex;
+        align-items: center;
+        padding: 14px 20px;
+        border: 2px solid #e8eaed;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .option-item input[type="radio"] {
+        margin-right: 15px;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary);
+      }
+      .option-item label:hover {
+        background: #f1f8ff;
+        border-color: var(--primary);
+      }
+      .option-item input[type="radio"]:checked + span {
+        font-weight: 600;
+      }
+
+      /* Result States */
+      .correct-answer {
+        border-color: var(--success) !important;
+        background: #e6f4ea !important;
+      }
+      .wrong-answer {
+        border-color: var(--error) !important;
+        background: #fce8e6 !important;
+      }
+
+      /* Columns for Match Style */
+      .columns {
+        display: flex;
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .column {
+        flex: 1;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px dashed #dadce0;
+      }
+      .column h4 {
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #5f6368;
+      }
+
+      /* Explanation Box */
+      .explain {
+        background: #fdf7e3;
+        padding: 15px 20px;
+        border-left: 4px solid #fbbc04;
+        border-radius: 8px;
+        margin-top: 20px;
+        display: none; /* Hidden until submit */
+      }
+
+      /* Action Buttons */
+      .btn-container {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 14px rgba(26, 115, 232, 0.4);
+      }
+      .submit-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+      }
+
+      /* Result Section */
+      #result-section {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      #score-chart {
+        max-width: 250px;
+        margin: 20px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Paper: {{ concept.paper.name }}</h1>
+        <h2>Concept: {{ concept.name }}</h2>
+      </header>
+
+      <div id="result-section">
+        <h3>Quiz Performance</h3>
+        <canvas id="score-chart"></canvas>
+        <div
+          id="score-text"
+          style="font-size: 24px; font-weight: 700; margin-top: 15px"
+        ></div>
+      </div>
+
+      <form id="quiz-form" >
+        {% for q in questions %}
+        <div class="question-card" data-qindex="{{ forloop.counter }}">
+          <div class="question-header">
+            Question {{ forloop.counter }} — {{ q.questiontype.name|lower }}
+          </div>
+
+          {% if q.questiontype.name|lower == "mcq" %}
+      {% for item  in q.question_data %}
+      <p> Q {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b>{{item.correct}}</p>
+            <p><b>Explanation:</b>{{item.explain}}</p> <br>
+{% endfor %}
+
+          {% elif q.questiontype.name|lower == "match the following" %}
+
+    {% for item in q.question_data %}
+         <p> Q {{forloop.counter}} . {{ item.question }}</p> 
+
+        <div class="columns" style="display:flex; gap:40px; margin-bottom:15px;">
+            <div class="column">
+                <h4>Column A</h4>
+                {% for key, value in item.column_A.items %}
+                    <p>{{ key }}. {{ value }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="column">
+                <h4>Column B</h4>
+                {% for key, value in item.column_B.items %}
+                    <p>{{ key }}. {{ value }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="options-list">
+            {% for key, value in item.options.items %}
+                <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span> <br>
+              </label>
+            {% endfor %}
+        </div>
+        <p><b>Correct:</b>{{ item.answer }}</p>
+        <p><b>Explanation:</b>{{ item.correct_explanation }}</p> <br>
+        
+        {% endfor %}
+        <input
+        type="hidden"
+        class="correct-val"
+        value="{{ q.question_data.0.answer }}"
+        />
+        <hr>
+        
+        {% elif q.questiontype.name|lower == "multiple statement questions" %}
+           {% for item  in q.question_data %}
+      <p> Q {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <ul style="margin-bottom:15px;padding-left:20px;">
+            {% for key, stmt in item.statements.items  %}
+            <li style="list-style:none"> {{key}}. {{stmt}} </li>
+            {% endfor %}
+          </ul>
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b> {{item.correct}}</p>
+            <p><b>Explanation:</b> {{item.explanation}}</p> <br>
+{% endfor %}
+        <hr>
+          <!-- which of the following is true or not  -->
+            {% elif q.questiontype.name|lower == "which of the following is true or not" %}
+           {% for item  in q.question_data %}
+      <p> Q {{forloop.counter}} . {{ item.concept}}</p> 
+      <p> Q {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b>{{item.correct}}</p>
+            <p><b>Explanation:</b>{{item.explain}}</p> <br>
+{% endfor %}
+
+          <!-- which of the following is true or not  -->
+            {% elif q.questiontype.name|lower == "assertion reason" %}
+           {% for item  in q.question_data %}
+      <p> Q {{forloop.counter}} . {{ item.assertion}}</p> 
+      <p> Q {{forloop.counter}} . {{ item.reason }}</p> 
+      <ul> 
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b>{{item.answer}}</p>
+            <p><b>Explanation:</b>{{item.explanation}}</p> <br>
+{% endfor %}
+
+
+
+          <!-- which among -->
+            {% elif q.questiontype.name|lower == "which among" %}
+           {% for item  in q.question_data %}
+      <p> Q {{forloop.counter}} . {{ item.concepts}}</p> 
+      <p> Q {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b>{{item.correct}}</p>
+            <p><b>Explanation:</b>{{item.explain}}</p> <br>
+{% endfor %}
+          
+          
+        
+            <!-- Arrange the following   -->
+            {% elif q.questiontype.name|lower == "arrange the following" %}
+              {% for item  in q.question_data %}
+      <p>  {{forloop.counter}} . {{ item.question }}</p> 
+      <p>  {{forloop.counter}} . {{ item.concepts }}</p> 
+       <ul style="margin-bottom:15px;padding-left:20px;">
+            {% for key, stmt in item.statements.items  %}
+            <li style="list-style:none"> {{key}}. {{stmt}} </li>
+            {% endfor %}
+          </ul>
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b> {{item.answer}}</p>
+            <p><b>Explanation:</b> {{item.explanation}}</p> <br>
+{% endfor %}
+          </div>
+          <input
+            type="hidden"
+            class="correct-val"
+            value="{{ q.question_data.0.answer }}"
+          />
+      {% elif q.questiontype.name|lower == "correct incorrect statements" %}
+           {% for item  in q.question_data %}
+      <p>  {{forloop.counter}} . {{ item.question }}</p> 
+      <p>  {{forloop.counter}} . {{ item.statement }}</p> 
+       <ul style="margin-bottom:15px;padding-left:20px;">
+            {% for key, stmt in item.statements.items  %}
+            <li style="list-style:none"> {{key}}. {{stmt}} </li>
+            {% endfor %}
+          </ul>
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b> {{item.correct}}</p>
+            <p><b>Explanation:</b> {{item.explanation}}</p> <br>
+{% endfor %}
+  {% elif q.questiontype.name|lower == "correct incorrect pair" %}
+           {% for item  in q.question_data %}
+           <p>  {{forloop.counter}} . {{ item.concepts }}</p> 
+      <p>  {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <ul style="margin-bottom:15px;padding-left:20px;">
+            {% for key, stmt in item.pairs.items  %}
+            <li style="list-style:none"> {{key}}. {{stmt}} </li>
+            {% endfor %}
+          </ul>
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b> {{item.answer}}</p>
+            <p><b>Explanation:</b> {{item.correct_explanation}} </p> <br>
+{% endfor %}
+  {% elif q.questiontype.name|lower == "consider the following statements" %}
+           {% for item  in q.question_data %}
+           <p>  {{forloop.counter}} . {{ item.concepts }}</p> 
+      <p>  {{forloop.counter}} . {{ item.question }}</p> 
+      <ul> 
+       <ul style="margin-bottom:15px;padding-left:20px;">
+            {% for key, stmt in item.statements.items  %}
+            <li style="list-style:none"> {{key}}. {{stmt}} </li>
+            {% endfor %}
+          </ul>
+       <div class="options-list">
+            {% for key,value in item.options.items %}
+            <div class="option-item">
+              <label>
+                <input
+                  type="radio"
+                  name="q{{ forloop.parentloop.counter }}"
+                  value="{{ key }}"
+                  required
+                />
+                <span>{{ key }}. {{ value }}</span>
+              </label>
+            </div> 
+            {% endfor %}        
+            <p><b>Correct:</b> {{item.answer}}</p>
+            <p><b>Explanation:</b> {{item.explanation}} </p> <br>
+{% endfor %}
+          {% endif %}
+
+         
+        </div>
+        {% empty %}
+        <p style="text-align: center">No questions found for this concept.</p>
+        {% endfor %}
+        
+        <div class="btn-container">
+          <button type="submit" class="submit-btn">Submit Quiz</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document.getElementById('quiz-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+
+          let total = {{ questions|length }};
+          let correctCount = 0;
+
+          // Process each card
+          document.querySelectorAll('.question-card').forEach((card, index) => {
+              const selected = card.querySelector('input[type="radio"]:checked');
+              const correctVal = card.querySelector('.correct-val')?.value;
+              const explanation = card.querySelector('.explain');
+
+              if (selected) {
+                  const label = selected.closest('label');
+                  if (selected.value === correctVal) {
+                      correctCount++;
+                      label.classList.add('correct-answer');
+                  } else {
+                      label.classList.add('wrong-answer');
+                      // Highlight the true correct one
+                      const correctRadio = card.querySelector(`input[value="${correctVal}"]`);
+                      if(correctRadio) correctRadio.closest('label').classList.add('correct-answer');
+                  }
+              }
+
+              if(explanation) explanation.style.display = 'block';
+          });
+
+          // Show Results
+          document.getElementById('result-section').style.display = 'block';
+          document.getElementById('score-text').innerText = `You scored ${correctCount} out of ${total}`;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Draw Pie Chart
+          drawChart(correctCount, total - correctCount);
+      });
+
+      function drawChart(correct, wrong) {
+          const canvas = document.getElementById('score-chart');
+          const ctx = canvas.getContext('2d');
+          canvas.width = 250;
+          canvas.height = 250;
+
+          const total = correct + wrong;
+          const angles = [(correct/total)*2*Math.PI, (wrong/total)*2*Math.PI];
+          const colors = ['#34a853', '#ea4335'];
+
+          let startAngle = 0;
+          for (let i = 0; i < 2; i++) {
+              ctx.beginPath();
+              ctx.moveTo(125, 125);
+              ctx.arc(125, 125, 100, startAngle, startAngle + angles[i]);
+              ctx.fillStyle = colors[i];
+              ctx.fill();
+              startAngle += angles[i];
+          }
+
+          // Create hole in middle (Donut style)
+          ctx.beginPath();
+          ctx.arc(125, 125, 60, 0, 2 * Math.PI);
+          ctx.fillStyle = "white";
+          ctx.fill();
+      }
+    </script>
+  </body>
+</html>

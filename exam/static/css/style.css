@@ -1,0 +1,199 @@
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #f8fafc;
+    --text-dark: #1e293b;
+    --accent-success: #22c55e;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    background-color: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+/* Sidebar Styling */
+.side-navigation {
+    width: 260px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    padding: 2rem 1rem;
+    position: sticky;
+    top: 0;
+}
+
+.brand-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+}
+
+/* Container styling */
+.side-navigation {
+    width: 250px;
+    background-color: #ffffff;
+    height: 100vh;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Logo styling */
+.brand-logo {
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+.brand-logo span {
+    color: #007bff; /* Primary color for 'Psc' */
+}
+
+/* List styling */
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Target the List Items and Anchors */
+.nav-links li, 
+.nav-links li a {
+    text-decoration: none; /* Removes the underline from anchor */
+    color: #555;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease; /* Smooth animation for everything */
+    cursor: pointer;
+}
+
+/* Specific styling for the icons */
+.nav-links i {
+    margin-right: 15px;
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+/* --- THE ANIMATION LOGIC --- */
+
+/* Hover effect for both plain <li> and <a> inside <li> */
+.nav-links li:hover,
+.nav-links li a:hover {
+    background-color: #f0f7ff; /* Light blue tint */
+    color: #007bff;            /* Text turns blue */
+    padding-left: 25px;        /* Subtle "sliding" animation */
+}
+
+/* Active State (The currently selected page) */
+.nav-links li.active-link {
+    background-color: #007bff;
+    color: white !important;
+    border-left: 5px solid #0056b3;
+}
+
+/* Ensure the link inside active-link is also white */
+.active-link a {
+    color: white !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Exam Cards & Layout */
+.content-wrapper {
+    flex: 1;
+    padding: 2rem 3rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid #f1f5f9;
+}
+
+.exam-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.exam-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Realistic Button Animation */
+.btn-start-exam {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+}
+
+.btn-start-exam:hover {
+    background: #4338ca;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.23);
+    padding-right: 40px; /* Make room for arrow */
+}
+
+.btn-start-exam::after {
+    content: '→';
+    position: absolute;
+    right: -20px;
+    transition: 0.3s;
+}
+
+.btn-start-exam:hover::after {
+    right: 15px;
+}
+/* Modern styling for the link-button */
+        .btn-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none; /* Removes the underline */
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-link:hover {
+            background-color: #0056b3;
+        }
+    

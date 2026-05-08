@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Portal - RRB</title>
+    <style>
+        /* Perfect Margin & Professional Layout */
+        :root {
+            --rrb-blue: #0b3d91;
+            --success-bg: #e6f4ea;
+            --success-text: #1e7e34;
+            --border-gray: #dadce0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* Refresh Alert Bar */
+        .refresh-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #ffeeba;
+        }
+
+        /* Question Card Styling */
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .meta-info {
+            font-size: 12px;
+            color: #5f6368;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            text-transform: uppercase;
+        }
+
+        h3 {
+            color: #202124;
+            font-size: 18px;
+            margin-top: 0;
+            line-height: 1.6;
+        }
+
+        /* Options Styling */
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .options-list li {
+            padding: 12px 15px;
+            border: 1px solid #f1f3f4;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        /* Highlight Correct Answer */
+        .option-correct {
+            background-color: var(--success-bg);
+            border-color: #34a853 !important;
+            font-weight: 600;
+            color: var(--success-text);
+        }
+
+        .option-correct::after {
+            content: "✓ Correct";
+            margin-left: auto;
+            font-size: 12px;
+        }
+
+        /* Explain Box */
+        .explain-box {
+            background-color: #f1f8ff;
+            border-left: 5px solid var(--rrb-blue);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .explain-title {
+            font-weight: bold;
+            color: var(--rrb-blue);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Match the Following Table */
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .match-table td {
+            border: 1px solid #eee;
+            padding: 10px;
+            width: 50%;
+        }
+
+        @media print {
+            .refresh-notice, .no-print { display: none; }
+            body { background: white; padding: 0; }
+            .card { border: none; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="refresh-notice no-print">
+        పేజీ ప్రతి 5 సెకన్లకు ఆటోమేటిక్‌గా రిఫ్రెష్ అవుతుంది. తదుపరి అప్‌డేట్: <span id="timer">5</span> సెకన్లలో...
+    </div>
+
+    {% for q in questions %}
+    <div class="card">
+        <div class="meta-info">
+            <span><strong>Paper:</strong> {{q.concept.paper.name}}</span>
+            <span><strong>Concept:</strong> {{q.concept.name}}</span>
+            <span><strong>Type:</strong> {{q.questiontype.name}}</span>
+        </div>
+
+        {% for item in q.question_data %}
+            <h3>{{forloop.counter}}. {{item.question}}</h3>
+
+            {% if item.column_A %}
+            <table class="match-table">
+                <tr>
+                    <td><strong>Column A</strong></td>
+                    <td><strong>Column B</strong></td>
+                </tr>
+                {% for key, val in item.column_A.items %}
+                <tr>
+                   
+                    <td>
+                        {% for A_key, A_val in item.column_A.items %}
+                            {% if A_key == key %}{{A_key}}. {{A_val}}{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                 {% endfor %}
+                 {% for key,value in item.column_B.items %}
+                <tr>
+                    <td>
+                        {% for b_key, b_val in item.column_B.items %}
+                            {% if b_key == key %}{{b_key}}. {{b_val}}{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                 {% endfor %}
+            </table>
+            {% endif %}
+
+            <ul class="options-list">
+                {% for key, value in item.options.items %}
+                    <li class="{% if key == item.correct %}option-correct{% endif %}">
+                        {{key}}. {{value}}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="explain-box">
+                <span class="explain-title">వివరణ (Explanation):</span>
+                <p style="margin:0; font-size: 14px;">{{item.explain}}</p>
+            </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    // Countdown Timer Logic
+    let timeLeft = 5;
+    const timerElement = document.getElementById('timer');
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        if (timerElement) timerElement.innerText = timeLeft;
+        if (timeLeft <= 0) clearInterval(countdown);
+    }, 1000);
+
+    // Page Refresh Logic
+    setTimeout(function(){
+        location.reload();
+    }, 5000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+<h2>all question types</h2>
+{% for t in types %}
+<li>{{t.name}}</li>
+{% empty %}
+<li> no question types found </li>
+{% endfor %}
+<a href="{% url 'create_question_type' %}">add new type</a>

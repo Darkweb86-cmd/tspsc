@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Paper</title>
+</head>
+<body>
+
+<h2>Create Paper</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Paper</button>
+</form>
+
+</body>
+</html>

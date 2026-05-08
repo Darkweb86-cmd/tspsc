@@ -1,0 +1,8 @@
+<title>add question type</title>
+<h2>add question type</h2>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">save</button>
+</form>
+<a href="{% url 'question_type_list' %}">view all types</a>

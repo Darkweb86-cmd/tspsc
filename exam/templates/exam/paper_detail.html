@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>{{ paper.name }} - TSPSC Dashboard</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    padding:20px;
+}
+
+h2 { text-align:center; margin-bottom:30px; color:#1a73e8; }
+
+/* Concept box */
+.concept-box{
+    background:#fff;
+    padding:15px;
+    margin-bottom:10px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    transition:0.2s;
+}
+.concept-box:hover { box-shadow:0 4px 10px rgba(0,0,0,0.15); }
+
+/* Subconcepts */
+.subconcept-container{
+    display:none;
+    margin-top:10px;
+    margin-left:20px;
+}
+.subconcept{
+    background:#f9f9f9;
+    margin-bottom:5px;
+    padding:8px 12px;
+    border-radius:6px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 1px 3px rgba(0,0,0,0.05);
+}
+.subconcept:hover { background:#e0f0ff; }
+
+/* Start Practice button */
+.start-btn{
+    padding:5px 10px;
+    background:#1a73e8;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    transition:0.2s;
+}
+.start-btn:hover{ background:#1558b0; }
+
+/* Question count badge */
+.q-count{
+    background:#1a73e8;
+    color:#fff;
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:12px;
+    margin-left:10px;
+}
+</style>
+</head>
+<body>
+
+<h2>{{ paper.name }}</h2>
+
+{% for concept in concepts %}
+<div class="concept-box" data-id="{{ concept.id }}">
+    <strong>{{ concept.name }}</strong>
+    <span class="q-count">{{ concept.questions.count }} Questions</span>
+
+    <div class="subconcept-container"></div>
+</div>
+{% endfor %}
+
+<script>
+// Load subconcepts with slide animation
+function loadSubconcepts(conceptBox){
+    var conceptId = $(conceptBox).data("id");
+    var container = $(conceptBox).find(".subconcept-container");
+
+    $.ajax({
+        url: "/ajax/subconcepts/" + conceptId + "/",
+        method: "GET",
+        success: function(response){
+            container.empty(); // clear previous
+
+            response.subconcepts.forEach(function(sub){
+                container.append(
+                    "<div class='subconcept'>" +
+                        "<span>"+sub.name+"</span>" +
+                        "<span>" +
+                        "<span class='q-count'>"+sub.question_count+" Qs</span> " +
+                        "<button class='start-btn' onclick='startPractice("+sub.id+")'>Ready</button>" +
+                        "</span>" +
+                    "</div>"
+                );
+            });
+
+            container.slideDown(); // animated open
+        }
+    });
+}
+
+// Click to expand/collapse concept
+$(".concept-box").click(function(){
+    var container = $(this).find(".subconcept-container");
+
+    if(container.children().length > 0){
+        container.slideToggle();
+    } else {
+        loadSubconcepts(this);
+    }
+});
+
+// Auto-refresh every 10 seconds
+setInterval(function(){
+    $(".concept-box").each(function(){
+        if($(this).find(".subconcept-container").is(":visible")){
+            loadSubconcepts(this);
+        }
+    });
+}, 10000);
+
+// Start practice button
+function startPractice(subconceptId){
+    window.location.href="/practice/subconcept/"+subconceptId+"/";
+}
+</script>
+
+</body>
+</html>

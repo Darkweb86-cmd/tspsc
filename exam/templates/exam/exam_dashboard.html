@@ -1,0 +1,134 @@
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.8);
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --text-main: #2d3436;
+    }
+
+    body {
+        background: #f0f2f5; /* Light neutral background to make cards pop */
+        font-family: 'Inter', sans-serif;
+    }
+
+    .paper-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 40px;
+        letter-spacing: -1px;
+    }
+
+    /* The Grid */
+    .paper-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        list-style: none;
+        padding: 0;
+    }
+
+    /* The Premium Card */
+    .paper-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .paper-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        border-color: #667eea;
+    }
+
+    /* Decorative Background Element */
+    .paper-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    .paper-link {
+        text-decoration: none;
+        color: var(--text-main);
+        display: block;
+        position: relative;
+        z-index: 1;
+    }
+
+    .paper-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-gradient);
+        border-radius: 15px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .paper-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        transition: color 0.3s;
+    }
+
+    .paper-card:hover .paper-name {
+        color: #667eea;
+    }
+
+    .badge {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 5px 15px;
+        background: #eef2ff;
+        color: #6366f1;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="paper-container">
+    <h2 class="section-title">Available Papers</h2>
+    
+    <ul class="paper-grid">
+        {% for p in papers %}
+        <li>
+            <a href="{% url 'exam:paper_detail' p.id %}" class="paper-link">
+                <div class="paper-card">
+                    <div class="paper-icon">
+                        📄
+                    </div>
+                    <h3 class="paper-name">{{ p.name }}</h3>
+                    <span class="badge">View Syllabus</span>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

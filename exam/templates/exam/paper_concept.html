@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ paper.name }} Concepts</title>
+    
+</head>
+<style>
+    body {
+    font-family: Arial;
+    background: #f4f6f9;
+}
+
+.container {
+    width: 800px;
+    margin: 30px auto;
+}
+
+h1 {
+    text-align: center;
+    color: #007bff;
+}
+
+.concept-box {
+    background: white;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #ddd;
+}
+
+h2 {
+    color: #333;
+}
+</style>
+<body>
+
+<div class="container">
+    <h1>{{ paper.name }}</h1>
+
+    {% for concept in concepts %}
+        <div class="concept-box">
+            <h2>{{ concept.name }}</h2>
+
+            {% if concept.questions.all %}
+                <ul>
+                    {% for question in concept.questions.all %}
+                        <li>{{ question.question_text }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No questions available.</p>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No concepts found.</p>
+    {% endfor %}
+</div>
+
+</body>
+</html>

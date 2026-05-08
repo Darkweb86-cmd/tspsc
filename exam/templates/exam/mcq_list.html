@@ -1,0 +1,29 @@
+<meta http-equive="refresh" content="5">
+{% for q in mcqs %}
+
+
+<div class="card">
+    <p><b>paper:</b> {{q.concet.paper.name}}</p>
+    <p><b>Concept:</b> {{q.concept.name}}</p>
+    {% for item in q.question_data %}
+    <h3>{{forloop.counter}}.{{item.question}}</h3>
+<ul style="list-style:none;">
+{% for key,value in item.options.items %}
+    <li>{{key}}.{{value}}
+        {% if key == item.correct%}
+        <span class="correct"></span>
+        {% endif %}
+    {% endfor %} <br>
+    <p><b>Concept:</b> {{item.correct}}</p>
+    <p><b>Explain:</b> {{item.explain}}</p>
+{% endfor %}
+
+{% endfor %}
+
+<script>
+    setTimeout(function(){
+        location.reload();
+    }, 5000);
+</script>
+</body>
+<html>

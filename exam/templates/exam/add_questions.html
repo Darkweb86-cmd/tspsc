@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Questions</title>
+</head>
+<body>
+<style>
+    body {
+    font-family: Arial;
+    background: #f4f6f9;
+}
+
+.container {
+    width: 600px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ccc;
+}
+
+select, textarea, button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+textarea {
+    height: 200px;
+}
+
+button {
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+</style>
+<div class="container">
+    <h2>Add Questions (JSON Paste)</h2>
+
+    <form id="questionForm">
+        {% csrf_token %}
+
+        <select name="paper" required>
+            <option value="">Select Paper</option>
+            {% for p in papers %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="concept" required>
+            <option value="">Select Concept</option>
+            {% for c in concepts %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="question_type" required>
+            <option value="">Select Type</option>
+            {% for t in types %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+
+        <textarea name="json_data" placeholder="Paste JSON here..." required></textarea>
+
+        <button type="submit">Save Questions</button>
+    </form>
+
+    <div id="message"></div>
+</div>
+
+<script>
+    document.getElementById("questionForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let formData = new FormData(this);
+
+    fetch("", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "success"){
+            document.getElementById("message").innerHTML =
+                "<p style='color:green;'>Questions Saved Successfully!</p>";
+        } else {
+            document.getElementById("message").innerHTML =
+                "<p style='color:red;'>Error: " + data.message + "</p>";
+        }
+    });
+});
+
+</script>
+</body>
+</html>

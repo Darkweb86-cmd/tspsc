@@ -1,0 +1,95 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPro | Exam Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body id="exam-dashboard-root">
+
+   <nav class="side-navigation" id="main-sidebar">
+    <div class="brand-logo">Ts<span>Psc</span></div>
+    
+    <ul class="nav-links">
+        <li class="active-link"><a href="#"><i class="Profle"></i> Profile</a></li>
+        <li><a href="#"><i class="logout"></i> Logout</a></li>
+        <hr>
+        <li><i class="icon-home"></i> Dashboard</li>
+        <li><a href="icon-subjects"><i class="icon-book"></i> Subjects</a></li>
+        <li><i class="icon-result"></i> Results</li>
+        <li><i class="icon-settings"></i> Settings</li>
+
+        
+</nav>
+
+    <main class="content-wrapper" id="dashboard-main-content">
+        <header class="top-bar">
+            <h1>Welcome back, Alex!</h1>
+            <div class="user-profile">
+                <span id="user-notification-bell">🔔</span>
+                <img src="#" alt="User Avatar" class="avatar-img">
+                <ul>
+                  
+                </ul>
+            </div>
+        </header>
+        
+        <section class="stats-grid">
+            <div class="stat-card" id="stat-exams-completed">
+                <h3>12</h3>
+                <p>Exams Completed</p>
+            </div>
+            <div class="stat-card" id="stat-avg-score">
+                <h3>88%</h3>
+                <p>Average Score</p>
+            </div>
+            <div class="stat-card" id="stat-rank">
+                <h3>#4</h3>
+                <p>Global Rank</p>
+            </div>
+        </section>
+
+        <section class="exam-section">
+            <h2>Active Assessments</h2>
+            <div class="exam-card" id="exam-card-001">
+                <div class="exam-info">
+                    <h3>Paper1 </h3>
+                    <p>Duration: 60 Mins | 40 Questions</p>
+                </div>
+                <button class="btn-start-exam"  onclick="window.location.href='#"> Start Exam</button>
+                <!-- <button class="btn-start-exam"  onclick="window.location.href='templates/convert_csv.html';"> Convert to text </button> -->
+            </div>
+
+            <div class="exam-card" id="exam-card-002">
+                <div class="exam-info">
+                    <h3>Paper2 </h3>
+                    <p>Duration: 90 Mins | 50 Questions</p>
+                </div>
+                <button class="btn-start-exam" onclick="window.location.href='#';;" >Start Exam</button>
+            </div>
+            <div class="exam-card" id="exam-card-001">
+                <div class="exam-info">
+                    <h3>Paper3 </h3>
+                    <p>Duration: 60 Mins | 40 Questions</p>
+                </div>
+                <button class="btn-start-exam" onclick="window.location.href='#';;">Start Exam</button>
+            </div>
+
+            <div class="exam-card" id="exam-card-002">
+                <div class="exam-info">
+                    <h3>Paper4 </h3>
+                    <p>Duration: 90 Mins | 50 Questions</p>
+                </div>
+                <button class="btn-start-exam" onclick="window.location.href=">Start Exam</button>
+                
+            </div>
+        </section>
+    </main>
+    
+
+    <script src="js/script.js"></script>
+</body>
+</html>
